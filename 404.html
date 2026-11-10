@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Opening note...</title>
+<!-- GitHub Pages 404 hack: turns /Repo/note/abc into /Repo/?/note/abc (hash kept) so index.html can open it.
+     Set pathSegmentsToKeep = 1 for project sites (user.github.io/Repo/), 0 for user sites or a custom domain. -->
+<script>
+  var pathSegmentsToKeep = 1;
+  var l = window.location;
+  l.replace(
+    l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+    l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+    l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+    (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+    l.hash
+  );
+</script>
+<style>body{margin:0;height:100dvh;display:grid;place-items:center;text-align:center;padding:24px;font:19px/1.5 Roboto,sans-serif;background:#FDFBFF;color:#1A1C1E}a{color:#1877F2}</style>
+</head>
+<body><p>Opening your note...<br><a href="./">Tap here if nothing happens</a></p></body>
+</html>
