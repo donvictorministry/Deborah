@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1877F2">
+<title>Debora Note</title>
+<link rel="manifest" href="manifest.json">
+<meta property="og:title" content="Debora Note">
+<meta property="og:description" content="A powerful notepad for Android.">
+<meta property="og:image" content="OG_IMAGE_URL_HERE">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="bar" id="top">
+  <button class="ib" id="btnLeft" aria-label="Menu"></button>
+  <b>Debora Note</b>
+  <button class="ib" id="btnRight" aria-label="More options"></button>
+</header>
+<main id="views">
+  <section class="view on" id="v-home">
+    <div class="hero">
+      <div class="hero-ic" data-ic="edit"></div>
+      <h1>Welcome to Debora Note</h1>
+      <p>Write, save and lock your notes. Simple, private and always with you.</p>
+    </div>
+    <div class="quick">
+      <button class="qa" data-q="take"><i data-ic="edit"></i>Take Note</button>
+      <button class="qa" data-q="saved"><i data-ic="file"></i>Saved Note</button>
+      <button class="qa" data-q="recent"><i data-ic="clock"></i>Recent Files</button>
+      <button class="qa" data-q="locked"><i data-ic="lock"></i>Locked Note</button>
+    </div>
+  </section>
+  <section class="view" id="v-editor"><div id="editorMount"></div></section>
+  <section class="view" id="v-more"><div id="moreMount"></div></section>
+</main>
+<nav class="nav" id="nav">
+  <button class="nb on" data-v="home"><i data-ic="home"></i>Home</button>
+  <button class="nb" data-v="editor"><i data-ic="edit"></i>Editor</button>
+  <button class="nb" data-v="more"><i data-ic="more"></i>More</button>
+</nav>
+<div id="pages"></div>
+<div id="spin" aria-hidden="true"><div class="ring"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Modules: delete any line and the core keeps working -->
+<script src="app.js"></script>
+<script src="notepad.js"></script>
+<script src="computer-block.js"></script>
+</body>
+</html>
