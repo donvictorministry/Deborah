@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+/* keeps every file path correct when the page is opened on a clean note address (/note/<title>-<id>) */
+(function () {
+  var p = location.pathname, c = p.indexOf('/note/');
+  var b = document.createElement('base');
+  b.href = location.origin + (c > -1 ? p.slice(0, c + 1) : p.replace(/[^\/]*$/, ''));
+  document.head.insertBefore(b, document.head.firstChild);
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1877F2" id="dvThemeMeta">
+<title>Deborah)-(Note</title>
+<meta name="description" content="Write, lock, share and keep your notes.">
+
+<!-- link preview for WhatsApp and Facebook.
+     Replace YOUR-USERNAME and YOUR-REPO with your real address (must be the full https:// address).
+     Keep the same lines in 404.html. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deborah)-(Note">
+<meta property="og:title" content="Deborah)-(Note">
+<meta property="og:description" content="Write, lock, share and keep your notes.">
+<meta property="og:url" content="https://YOUR-USERNAME.github.io/YOUR-REPO/">
+<meta property="og:image" content="https://YOUR-USERNAME.github.io/YOUR-REPO/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+/* ===== DV SHELL STYLES ===== */
+:root{
+  --dv-primary:#1877F2;
+  --dv-surface:#FFFFFF;
+  --dv-bg:#F0F2F5;
+  --dv-text:#121212;
+  --dv-text-sub:#5F6368;
+  --dv-border:#E0E0E0;
+  --dv-shadow:0 2px 8px rgba(0,0,0,.12);
+  --dv-shadow-lg:0 12px 40px rgba(0,0,0,.3);
+}
+body[data-theme=dark]{
+  --dv-surface:#000000;
+  --dv-bg:#121212;
+  --dv-text:#FFFFFF;
+  --dv-text-sub:#B0B0B0;
+  --dv-border:#2A2A2A;
+  --dv-shadow:0 2px 8px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--dv-surface);color:var(--dv-text);font-family:Roboto,"Segoe UI",Arial,sans-serif;overflow:hidden}
+button{font-family:inherit}
+.dv-icon-btn{width:48px;height:48px;border:0;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.dv-icon-btn:active{background:rgba(255,255,255,.2)}
+/* the notepad module was designed with this rule; keep it identical */
+.dv-np *,.dv-np-dlg *{color:inherit;font-size:inherit}
+
+.dv-app{position:fixed;inset:0;height:100dvh;display:flex;flex-direction:column;background:var(--dv-surface)}
+.dv-top{background:var(--dv-primary);color:#fff;display:flex;align-items:center;gap:4px;padding:8px 6px;padding-top:calc(8px + env(safe-area-inset-top,0px));flex-shrink:0}
+.dv-top .dv-icon-btn{color:#fff}
+.dv-top h1{flex:1;margin:0;text-align:center;font-size:1.35rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dv-main{flex:1;overflow-y:auto;padding:16px}
+.dv-card{background:var(--dv-bg);border-radius:20px;padding:20px;box-shadow:var(--dv-shadow)}
+.dv-card h2{margin:0 0 8px;font-size:1.4rem}
+.dv-card p{margin:0;font-size:1.1rem;line-height:1.5;color:var(--dv-text-sub)}
+.dv-h{margin:24px 4px 12px;font-size:1.15rem;font-weight:700}
+.dv-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dv-tile{background:var(--dv-bg);border:1px solid var(--dv-border);border-radius:20px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;cursor:pointer;min-height:110px;color:var(--dv-text);font-size:1.15rem;font-weight:600}
+.dv-tile:active{border-color:var(--dv-primary);background:rgba(24,119,242,.15)}
+.dv-tile svg{width:32px;height:32px;color:var(--dv-primary)}
+.dv-empty{grid-column:1/-1;padding:24px 8px;text-align:center;color:var(--dv-text-sub);font-size:1.05rem}
+.dv-bottom{display:flex;background:var(--dv-bg);border-top:1px solid var(--dv-border);padding-bottom:env(safe-area-inset-bottom,0px);flex-shrink:0}
+.dv-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 12px;border:0;background:transparent;color:var(--dv-text-sub);font-size:1rem;font-weight:600;cursor:pointer}
+.dv-tab span.dv-pill{display:flex;align-items:center;justify-content:center;width:64px;height:32px;border-radius:16px}
+.dv-tab.dv-on{color:var(--dv-text)}
+.dv-tab.dv-on span.dv-pill{background:rgba(24,119,242,.2);color:var(--dv-primary)}
+
+/* full-screen side panels (100dvh) */
+.dv-panel{position:fixed;inset:0;height:100dvh;z-index:5000;background:var(--dv-surface);display:flex;flex-direction:column;visibility:hidden;transition:transform .25s ease,visibility .25s}
+.dv-left{transform:translateX(-100%)}
+.dv-right{transform:translateX(100%)}
+.dv-panel.dv-on{transform:translateX(0);visibility:visible}
+.dv-pbar{background:var(--dv-primary);color:#fff;display:flex;align-items:center;gap:8px;padding:8px 6px;padding-top:calc(8px + env(safe-area-inset-top,0px));font-size:1.3rem;font-weight:700;flex-shrink:0}
+.dv-pbar .dv-icon-btn{color:#fff}
+.dv-plist{flex:1;overflow-y:auto}
+.dv-row{display:flex;align-items:center;gap:16px;width:100%;padding:20px 18px;border:0;border-bottom:1px solid var(--dv-border);background:var(--dv-surface);color:var(--dv-text);font-size:1.2rem;font-weight:700;text-align:left;cursor:pointer}
+.dv-row:active{background:var(--dv-bg)}
+.dv-row svg{color:var(--dv-primary);flex-shrink:0}
+.dv-row[hidden]{display:none}
+.dv-switch{margin-left:auto;width:52px;height:30px;border-radius:15px;background:var(--dv-border);position:relative;flex-shrink:0;transition:background .2s}
+.dv-switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .2s}
+body[data-theme=dark] .dv-switch{background:var(--dv-primary)}
+body[data-theme=dark] .dv-switch::after{transform:translateX(22px)}
+.dv-foot{padding:20px 18px;color:var(--dv-text-sub);font-size:1rem}
+.dv-pempty{padding:28px 18px;color:var(--dv-text-sub);font-size:1.05rem;line-height:1.5}
+
+/* centre toast */
+.dv-toast{position:fixed;left:20px;right:20px;top:50%;transform:translateY(-50%);z-index:20000;text-align:center;pointer-events:none;opacity:0;transition:opacity .2s}
+.dv-toast.dv-on{opacity:1}
+.dv-toast span{display:inline-block;background:#121212;color:#fff;padding:14px 22px;border-radius:16px;font-size:1.15rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.35);border:1px solid #333}
+
+/* animated logo splash */
+.dvs-splash{position:fixed;inset:0;z-index:30000;background:#1877F2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .45s}
+.dvs-splash.dvs-out{opacity:0;pointer-events:none}
+.dvs-logo{width:min(86vw,440px);height:auto;overflow:visible}
+.dvs-tag{color:#D6E6FF;font-size:1.1rem;font-weight:600;animation:dvsU .6s 1.2s both}
+.dvs-w{font-family:Roboto,"Segoe UI",Arial,sans-serif;font-weight:800;font-size:84px;fill:#fff}
+.dvs-m{fill:none;stroke:#FFC107;stroke-width:10;stroke-linecap:round}
+.dvs-w1{animation:dvsL .8s .3s cubic-bezier(.2,.8,.2,1) both}
+.dvs-w2{animation:dvsR .8s .55s cubic-bezier(.2,.8,.2,1) both}
+.dvs-pl{animation:dvsL .7s cubic-bezier(.2,.8,.2,1) both}
+.dvs-pr{animation:dvsR .7s cubic-bezier(.2,.8,.2,1) both}
+.dvs-dash{stroke-dasharray:100;animation:dvsD .45s .65s ease-out both}
+.dvs-mark{animation:dvsP 1.4s 1.5s ease-in-out 2}
+@keyframes dvsL{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:none}}
+@keyframes dvsR{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:none}}
+@keyframes dvsD{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+@keyframes dvsU{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes dvsP{0%,100%{opacity:1}50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.dvs-splash *{animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="dvs-splash" id="dvSplash" aria-hidden="true">
+  <svg class="dvs-logo" viewBox="0 0 750 180" xmlns="http://www.w3.org/2000/svg">
+    <text class="dvs-w dvs-w1" x="50" y="120" textLength="340" lengthAdjust="spacingAndGlyphs">Deborah</text>
+    <g class="dvs-mark">
+      <path class="dvs-m dvs-pl" d="M410 46 C434 74 434 106 410 134"/>
+      <path class="dvs-m dvs-dash" pathLength="100" d="M440 90 L460 90"/>
+      <path class="dvs-m dvs-pr" d="M490 46 C466 74 466 106 490 134"/>
+    </g>
+    <text class="dvs-w dvs-w2" x="510" y="120" textLength="190" lengthAdjust="spacingAndGlyphs">Note</text>
+  </svg>
+  <div class="dvs-tag">Write, lock and share your notes</div>
+</div>
+<script>
+/* launch splash: skipped when a note link is opened so the note shows at once */
+(function () {
+  var s = document.getElementById('dvSplash'); if (!s) return;
+  if (location.pathname.indexOf('/note/') > -1 || /^\?\/note\//.test(location.search)) { s.remove(); return; }
+  setTimeout(function () { s.classList.add('dvs-out'); setTimeout(function () { s.remove(); }, 500); }, 2000);
+})();
+</script>
+
+<div class="dv-app" id="dvApp">
+  <header class="dv-top">
+    <button class="dv-icon-btn" id="dvBtnLeft" aria-label="Menu"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <h1 id="dvTitle"></h1>
+    <button class="dv-icon-btn" id="dvBtnRight" aria-label="Tools"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+  </header>
+
+  <main class="dv-main" id="dvHome">
+    <section class="dv-card"><h2 id="dvWelcome"></h2><p id="dvWelcomeText"></p></section>
+    <h3 class="dv-h">Quick actions</h3>
+    <div class="dv-grid" id="dvQuick"></div>
+  </main>
+
+  <nav class="dv-bottom">
+    <button class="dv-tab dv-on" data-dvtab="home"><span class="dv-pill"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Home</button>
+    <button class="dv-tab" data-dvtab="editor"><span class="dv-pill"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Editor</button>
+    <button class="dv-tab" data-dvtab="more"><span class="dv-pill"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>More</button>
+  </nav>
+</div>
+
+<!-- left menu -->
+<div class="dv-panel dv-left" id="dvLeft">
+  <div class="dv-pbar"><button class="dv-icon-btn" id="dvLeftBack" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button><span id="dvLeftTitle">Menu</span></div>
+  <div class="dv-plist">
+    <button class="dv-row" id="dvThemeRow" role="switch" aria-checked="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark mode<span class="dv-switch"></span></button>
+    <button class="dv-row" id="dvInstallRow" hidden><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install app</button>
+    <div class="dv-foot" id="dvVersion"></div>
+  </div>
+</div>
+
+<!-- right menu: features add themselves here through DV.addNavItem -->
+<div class="dv-panel dv-right" id="dvRight">
+  <div class="dv-pbar"><button class="dv-icon-btn" id="dvRightBack" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button><span>Tools</span></div>
+  <div class="dv-plist" id="dvNavList"></div>
+</div>
+
+<div class="dv-toast" id="dvToast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   DV SHELL - the host app for the Notepad module.
+   Provides window.DV (toast, route, openRoute, closeRoute, addNavItem,
+   addQuickAction), the right menu, quick actions, theme and the
+   Android Back handling. Features plug in and talk to it only through DV.
+   ===================================================================== */
+var dvConfig = {
+  appName: 'Deborah)-(Note',
+  version: 'v1.0',
+  themeColor: '#1877F2',
+  welcomeTitle: 'Welcome',
+  welcomeText: 'Write, lock, share and keep your notes. Open the Editor to start.'
+};
+
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  /* ----- names from the config ----- */
+  document.title = dvConfig.appName;
+  $('dvTitle').textContent = dvConfig.appName;
+  $('dvWelcome').textContent = dvConfig.welcomeTitle;
+  $('dvWelcomeText').textContent = dvConfig.welcomeText;
+  $('dvVersion').textContent = dvConfig.appName + ' ' + dvConfig.version;
+
+  /* ----- theme ----- */
+  function dvSetTheme(t) {
+    document.body.setAttribute('data-theme', t);
+    $('dvThemeRow').setAttribute('aria-checked', t === 'dark' ? 'true' : 'false');
+    $('dvThemeMeta').setAttribute('content', t === 'dark' ? '#000000' : dvConfig.themeColor);
+    try { localStorage.setItem('dv_theme', t); } catch (e) {}
+  }
+  var dvSaved = null;
+  try { dvSaved = localStorage.getItem('dv_theme'); } catch (e) {}
+  dvSetTheme(dvSaved === 'dark' ? 'dark' : 'light');
+  $('dvThemeRow').addEventListener('click', function () {
+    dvSetTheme(document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  /* ----- toast ----- */
+  var dvTT = 0;
+  function dvToast(m) {
+    var t = $('dvToast');
+    t.innerHTML = '<span></span>'; t.firstChild.textContent = m;
+    t.classList.add('dv-on'); clearTimeout(dvTT);
+    dvTT = setTimeout(function () { t.classList.remove('dv-on'); }, 1800);
+  }
+
+  /* ----- Android Back: side panels and routes ----- */
+  var dvRoutes = {}, dvActive = null, dvPanel = null, dvPend = null, dvClosing = false;
+  function dvTab(k) {
+    document.querySelectorAll('[data-dvtab]').forEach(function (b) { b.classList.toggle('dv-on', b.getAttribute('data-dvtab') === k); });
+  }
+  function dvOpenPanel(id) {
+    if (dvPanel || dvActive) return;
+    dvPanel = id; $(id).classList.add('dv-on');
+    history.pushState({ dvp: id }, '');
+  }
+  function dvClosePanel(then) {
+    if (!dvPanel) { if (then) then(); return; }
+    if (dvClosing) return;
+    dvClosing = true; dvPend = then || null;
+    history.back();
+  }
+  window.addEventListener('popstate', function () {
+    if (dvPanel) {
+      dvClosing = false;
+      $(dvPanel).classList.remove('dv-on'); dvPanel = null; dvTab('home');
+      var p = dvPend; dvPend = null; if (p) p();
+      return;
+    }
+    if (dvActive) {
+      var r = dvRoutes[dvActive]; dvActive = null;
+      if (r && r.close) r.close();
+      dvTab('home');
+    }
+  });
+
+  /* ----- quick actions (home screen) ----- */
+  var dvQuick = [];
+  function dvRenderQuick() {
+    var box = $('dvQuick');
+    if (!dvQuick.length) { box.innerHTML = '<div class="dv-empty">No quick actions yet.</div>'; return; }
+    box.innerHTML = '';
+    dvQuick.slice().sort(function (a, b) { return (a.order || 0) - (b.order || 0); }).forEach(function (q) {
+      var b = document.createElement('button');
+      b.className = 'dv-tile';
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (q.icon || '') + '</svg><span></span>';
+      b.lastChild.textContent = q.label;
+      b.addEventListener('click', function () { window.DV.openRoute(q.route); });
+      box.appendChild(b);
+    });
+  }
+  dvRenderQuick();
+
+  /* ----- right menu list ----- */
+  function dvNavEmpty() {
+    var list = $('dvNavList');
+    var has = list.querySelector('.dv-row');
+    var e = $('dvNavNone');
+    if (has && e) e.remove();
+    if (!has && !e) { list.innerHTML = '<div class="dv-pempty" id="dvNavNone">Nothing here yet.</div>'; }
+  }
+  dvNavEmpty();
+
+  /* ----- the DV API features plug into ----- */
+  window.DV = {
+    toast: dvToast,
+    route: function (name, cfg) { dvRoutes[name] = cfg; },
+    openRoute: function (name) {
+      var r = dvRoutes[name];
+      if (!r) { dvToast('This feature is not available'); return; }
+      if (dvActive) return;
+      dvActive = name; r.open();
+      history.pushState({ dvx: name }, '');
+    },
+    closeRoute: function () { if (dvActive) history.back(); },
+    addNavItem: function (o) {
+      var b = document.createElement('button');
+      b.id = o.id; b.className = 'dv-row'; b.innerHTML = o.html;
+      b.addEventListener('click', function () { dvClosePanel(function () { window.DV.openRoute(o.key); }); });
+      $('dvNavList').appendChild(b);
+      dvNavEmpty();
+    },
+    addQuickAction: function (o) { dvQuick.push(o); dvRenderQuick(); }
+  };
+
+  /* ----- buttons and tabs ----- */
+  $('dvBtnLeft').addEventListener('click', function () { dvOpenPanel('dvLeft'); });
+  $('dvBtnRight').addEventListener('click', function () { dvOpenPanel('dvRight'); });
+  $('dvLeftBack').addEventListener('click', function () { dvClosePanel(); });
+  $('dvRightBack').addEventListener('click', function () { dvClosePanel(); });
+  document.querySelectorAll('[data-dvtab]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-dvtab');
+      if (k === 'home') { dvClosePanel(); dvTab('home'); }
+      else if (k === 'editor') { window.DV.openRoute('notepad'); }
+      else if (k === 'more') { dvOpenPanel('dvRight'); }
+    });
+  });
+
+  /* ----- install app (belongs to the app, not to notes) ----- */
+  var dvInstallEv = null;
+  var dvStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); dvInstallEv = e;
+    if (!dvStandalone) $('dvInstallRow').hidden = false;
+  });
+  window.addEventListener('appinstalled', function () { dvInstallEv = null; $('dvInstallRow').hidden = true; dvToast('App installed'); });
+  $('dvInstallRow').addEventListener('click', function () {
+    var ev = dvInstallEv; if (!ev) return;
+    dvInstallEv = null; $('dvInstallRow').hidden = true;
+    ev.prompt();
+  });
+})();
+</script>
+
+<!-- the Notepad module plugs into the shell above (it also holds the note links and reader) -->
+<script src="notepad.js"></script>
+<script>
+/* offline support: sw.js (works on https and on localhost) */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+</body>
+</html>
